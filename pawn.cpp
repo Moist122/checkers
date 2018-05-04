@@ -1,9 +1,6 @@
 #include"pawn.hh"
 #include"square.hh"
-bool Checkers::Pawn::putOnSquare(Board::Square* sq) {
-    if(!sq->isOccupied()) {
+void Checkers::Pawn::putOnSquare(Square* sq) {
         _square=sq;
-        return true;
-    }
-    return false;
+
 }

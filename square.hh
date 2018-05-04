@@ -1,7 +1,7 @@
 #pragma once
 #include"board.hh"
 
-class Checkers::Board::Square {
+class Checkers::Square {
 public:
     Square(const Color col, const char x, const char y)
         :_color(col), coordinate_x(x), coordinate_y(y), _pawn(nullptr) {}
@@ -18,7 +18,8 @@ public:
         {return coordinate_y;}
     
     bool putPawn(Pawn* p);
-    bool removePawn();
+    bool removePawn()
+        {_pawn=nullptr;}
 private:
     const Color _color;
     const char coordinate_x;
