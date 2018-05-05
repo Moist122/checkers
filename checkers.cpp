@@ -40,7 +40,8 @@ Checkers::Checkers()
 }
 Checkers::~Checkers() {
     delete _board;
-    // delete pawns!
+    for(auto i: white_pawns) delete i;
+    for(auto i: black_pawns) delete i;
 }
 
 void Checkers::showBoard(char board[y_graphic_array][x_graphic_array]) {
