@@ -6,6 +6,8 @@ class Checkers::Pawn{
 public:
     Pawn(const Color col, Square* sq)
         :_color(col), _square(sq) {}
+    Pawn(Pawn& p)
+        :_color(p._color), king(p.king) {}
 
     Color getColor() const //get color of a pawn
         {return _color;}

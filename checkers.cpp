@@ -8,6 +8,8 @@
 Checkers::Checkers()
 :_board(new Board), move(WHITE), chosenPawn(nullptr), tp(CHOOSEPAWN){
     Board& b=*_board;
+    tp = CHOOSEPAWN;
+    move = WHITE;
     //create pawns
     for(char i=y_boundries[0];comp(y_boundries[0],i,y_boundries[0]+num_rows-1);++i)
         for(char j=x_boundries[0];comp(x_boundries[0],j,x_boundries[1]);++j)
@@ -36,6 +38,28 @@ Checkers::Checkers()
                 b(j,i)->putPawn(p);
                 black_pawns.push_back(p);
             }*/
+        
+}
+Checkers::Checkers(Checkers& game) {
+    _board = new Board();
+    //copy pawns
+    for(auto i: game.white_pawns) {
+        Square* sq = (*_board)(i->getSquare()->getX(),i->getSquare()->getY());
+        Pawn* p = new Pawn(i->getColor(),sq);
+        sq->putPawn(p);
+        white_pawns.push_back(p);
+    }
+    for(auto i: game.black_pawns) {
+        Square* sq = (*_board)(i->getSquare()->getX(),i->getSquare()->getY());
+        Pawn* p = new Pawn(i->getColor(),sq);
+        sq->putPawn(p);
+        black_pawns.push_back(p);
+    }
+    move = game.move;
+    tp = game.tp;
+    if(game.chosenPawn) {
+        choosePawn(game.chosenPawn->getSquare()->getX(),game.chosenPawn->getSquare()->getY());
+    }
         
 }
 Checkers::~Checkers() {
@@ -197,6 +221,8 @@ bool Checkers::makeMove(char x, char y) {
                 changePlayer();
                 tp=CHOOSEPAWN;
             }
+            else
+                tp = CHOOSECAPTURE;
         return true;
     }
     if(chosenPawn->isKing()){
@@ -219,13 +245,15 @@ bool Checkers::makeMove(char x, char y) {
                     changePlayer();
                     tp=CHOOSEPAWN;
                 }
+                else
+                    tp = CHOOSECAPTURE;
             return true;
         }
     }
     return false;
 }
 
-bool Checkers::capture(char x, char y) { //doesnt work!
+bool Checkers::capture(char x, char y) {
     if(!_board->onBoard(x,y)) return false;
     auto pawnColor = chosenPawn->getColor();
     auto sq1 = chosenPawn->getSquare();
@@ -241,6 +269,8 @@ bool Checkers::capture(char x, char y) { //doesnt work!
                 changePlayer();
                 tp=CHOOSEPAWN;
             }
+            else
+                tp = CHOOSECAPTURE;
         return true;
     }
     if(chosenPawn->isKing())
@@ -255,6 +285,8 @@ bool Checkers::capture(char x, char y) { //doesnt work!
                     changePlayer();
                     tp=CHOOSEPAWN;
                 }
+                else
+                    tp = CHOOSECAPTURE;
                 return true;
         }
     return false;
@@ -296,4 +328,41 @@ bool Checkers::checkBlackWin() {
     for(auto i:white_pawns)
         if(isAbleToMove(i)||isAbleToCapture(i)) return false;
     return true;
+}
+
+bool Checkers::gameWon() {
+    if((move==WHITE&&checkBlackWin())||(move==BLACK&&checkWhiteWin()))
+        return true;
+    return false;
+}
+
+bool Checkers::playerChoice(char a, char b) {
+    if(tp==CHOOSEPAWN)
+        return choosePawn(a,b);
+    else if(tp==CHOOSEMOVE)
+        return makeMove(a,b);
+    else
+        return capture(a,b);
+}
+
+void Checkers::getChosenPawnCoordinates(char str[3]) {
+    Square* sq=chosenPawn->getSquare();
+    str[0]=sq->getX();
+    str[1]=sq->getY();
+    str[2]='\0';
+}
+
+int Checkers::evaluate() {
+    int result = white_pawns.size() - black_pawns.size();
+    for(auto i: white_pawns) if(i->isKing()) result+=2;
+    for(auto i: black_pawns) if(i->isKing()) result-=2;
+    if(move==WHITE&&checkBlackWin()) return -1000;
+    if(move==BLACK&&checkWhiteWin()) return 1000;
+    return result;
+}
+
+std::list<Checkers::Pawn*> Checkers::listPawns() {
+    if(move==WHITE)
+        return white_pawns;
+    return black_pawns;
 }

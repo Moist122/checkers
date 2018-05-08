@@ -2,8 +2,8 @@
 #include<list>
 #include"comparators.hh"
 
-constexpr char board_size=5; //board is square board_size x board_size
-constexpr char num_rows=2; //number of rows with pawns at the start
+constexpr char board_size=8; //board is square board_size x board_size
+constexpr char num_rows=3; //number of rows with pawns at the start
 constexpr char x_boundries[]={'A','A'+board_size-1}; //boundries of x coordinates on board
 constexpr char y_boundries[]={'1','1'+board_size-1}; //boundries of y coordinates on board
 constexpr char x_graphic_array = 2*board_size+6; //size of char array representing board graphicly
@@ -19,7 +19,7 @@ public:
     class Pawn;
     class Square;
     enum Color {WHITE, BLACK}; //colors of pawns and squares
-    enum TurnPhase {CHOOSEPAWN, CHOOSEMOVE}; //turn phases
+    enum TurnPhase {CHOOSEPAWN, CHOOSEMOVE, CHOOSECAPTURE}; //turn phases
 
     const TurnPhase getTP() //get current turn phase
         {return tp;}
@@ -38,6 +38,12 @@ public:
         // true if white can't move or has no pawns
     Color whoseMove() const //whose move is now
         {return move;}
+    bool playerChoice(char a, char b); //player chooses pawn or move
+    bool gameWon(); //check if a player won the game
+    void getChosenPawnCoordinates(char[3]);
+    std::list<Pawn*> listPawns();
+
+    int evaluate();
     
 private:
     bool isAbleToMove(Pawn*); //check if pawn can make move
