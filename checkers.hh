@@ -1,5 +1,6 @@
 #pragma once
 #include<list>
+#include<vector>
 #include"comparators.hh"
 
 constexpr char board_size=8; //board is square board_size x board_size
@@ -12,8 +13,10 @@ constexpr char y_graphic_array = 2*board_size+3;
 class Checkers {
     //class representing a game of checkers
 public:
+static int counter;
     Checkers(); //create basic game object
-    Checkers(Checkers&); //TODO
+    Checkers(const Checkers&); //copy constructor
+    void operator=(Checkers&);
     ~Checkers();
     class Board;
     class Pawn;
@@ -44,6 +47,8 @@ public:
     std::list<Pawn*> listPawns();
 
     int evaluate();
+    bool onBoard(char a, char b);
+    //std::vector<char> makeDecision(char);
     
 private:
     bool isAbleToMove(Pawn*); //check if pawn can make move

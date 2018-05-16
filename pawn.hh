@@ -4,8 +4,8 @@
 class Checkers::Pawn{
     //pawn in checkers
 public:
-    Pawn(const Color col, Square* sq)
-        :_color(col), _square(sq) {}
+    Pawn(const Color col, Square* sq, bool k=false)
+        :_color(col), _square(sq), king(k) {}
     Pawn(Pawn& p)
         :_color(p._color), king(p.king) {}
 

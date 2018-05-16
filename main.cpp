@@ -1,5 +1,6 @@
 #include<iostream>
 #include"checkers.hh"
+#include"decision_tree.hh"
 
 using namespace std;
 
@@ -21,25 +22,46 @@ int main() {
             cout<<"White's move."<<endl;
         else
             cout<<"Black's move."<<endl;
-        if(game.getTP()==game.CHOOSEPAWN)
-            cout<<"Choose pawn to move:"<<endl;
-        else if(game.getTP()==game.CHOOSEMOVE){
-            game.getChosenPawnCoordinates(currentPawn);
-            cout<<"Choose move of pawn "\
-                <<currentPawn<<':'<<endl;
+        if(game.whoseMove()==game.WHITE) {
+            if(game.getTP()==game.CHOOSEPAWN)
+                cout<<"Choose pawn to move:"<<endl;
+            else if(game.getTP()==game.CHOOSEMOVE){
+                game.getChosenPawnCoordinates(currentPawn);
+                cout<<"Choose move of pawn "\
+                    <<currentPawn<<':'<<endl;
+            }
+            else {
+                game.getChosenPawnCoordinates(currentPawn);
+                cout<<"Choose next capture of pawn "\
+                    <<currentPawn<<':'<<endl;
+            }
+            cin>>choice;
+            while(!game.playerChoice(choice[0],choice[1])) {
+                cout<<"Invalid choice, try again."<<endl;
+                cin>>choice;
+            }
         }
         else {
-            game.getChosenPawnCoordinates(currentPawn);
-            cout<<"Choose next capture of pawn "\
-                <<currentPawn<<':'<<endl;
-        }
-        cin>>choice;
-        cout<<choice[0]<<choice[1]<<endl;
-        while(!game.playerChoice(choice[0],choice[1])) {
-            cout<<"Invalid choice, try again."<<endl;
-            cin>>choice;
-        }
-    }
+            vector<char> dec = makeDecision(&game, 6); //set difficulty
+
+            for(int i=0;i<dec.size();i+=2) {
+                if(game.getTP()==game.CHOOSEPAWN)
+                cout<<"Choose pawn to move:"<<endl;
+                else if(game.getTP()==game.CHOOSEMOVE){
+                game.getChosenPawnCoordinates(currentPawn);
+                cout<<"Choose move of pawn "<<currentPawn<<':'<<endl;
+                }
+                else {
+                game.getChosenPawnCoordinates(currentPawn);
+                cout<<"Choose next capture of pawn "<<currentPawn<<':'<<endl;
+                }
+                cout<<dec[i]<<dec[i+1]<<endl;
+            game.playerChoice(dec[i],dec[i+1]);
+        printBoard(board,&game);
+
+            }
+            cout<<endl;
+    }}
     if(game.whoseMove()==game.BLACK) cout<<"White won!"<<endl;
     else cout<<"Black won!"<<endl;
     return 0;
