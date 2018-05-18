@@ -6,15 +6,12 @@
 
 #include<algorithm>
 
-int Checkers::counter=0;
-
 Checkers::Checkers()
 :_board(new Board), move(WHITE), chosenPawn(nullptr), tp(CHOOSEPAWN){
-    counter++;
     Board& b=*_board;
     tp = CHOOSEPAWN;
     move = WHITE;
-    //create pawns
+    //create white pawns
     for(char i=y_boundries[0];comp(y_boundries[0],i,y_boundries[0]+num_rows-1);++i)
         for(char j=x_boundries[0];comp(x_boundries[0],j,x_boundries[1]);++j)
             if(b(j,i)->getColor()==WHITE){
@@ -22,8 +19,7 @@ Checkers::Checkers()
                 b(j,i)->putPawn(p);
                 white_pawns.push_back(p);
             }
-    //(*_board)('A','3')->getPawn()->promote();
-
+    //create black pawns
     for(char i=y_boundries[1];comp(y_boundries[1]-num_rows+1,i,y_boundries[1]);--i)
         for(char j=x_boundries[0];comp(x_boundries[0],j,x_boundries[1]);++j)
             if(b(j,i)->getColor()==WHITE){
@@ -31,25 +27,8 @@ Checkers::Checkers()
                 b(j,i)->putPawn(p);
                 black_pawns.push_back(p);
             }
-            /*(*_board)('B','6')->getPawn()->promote();
-            (*_board)('D','6')->getPawn()->promote();
-            (*_board)('F','6')->getPawn()->promote();
-            (*_board)('H','6')->getPawn()->promote();*/
-                //Pawn* p=new Pawn(WHITE,b('H','4'));
-                //b('H','4')->putPawn(p);
-                //white_pawns.push_back(p);
-/*
-    for(char i=y_boundries[1]-3;comp(y_boundries[1]-3,i,y_boundries[1]);--i)
-        for(char j=x_boundries[0];comp(x_boundries[0],j,x_boundries[1]);++j)
-            if(b(j,i)->getColor()==WHITE){
-                Pawn* p=new Pawn(BLACK,b(j,i));
-                b(j,i)->putPawn(p);
-                black_pawns.push_back(p);
-            }*/
-        
 }
 Checkers::Checkers(const Checkers& game) {
-    counter++;
     _board = new Board();
     //copy pawns
     for(auto i: game.white_pawns) {
@@ -71,37 +50,7 @@ Checkers::Checkers(const Checkers& game) {
     }
         
 }
-/*
-void Checkers::operator=(Checkers& game) {
-    //counter++;
-    delete _board;
-    for(auto i: white_pawns) delete i;
-    for(auto i: black_pawns) delete i;
-    
-    white_pawns.clear();
-    black_pawns.clear();
-    _board = new Board();
-    //copy pawns
-    for(auto i: game.white_pawns) {
-        Square* sq = (*_board)(i->getSquare()->getX(),i->getSquare()->getY());
-        Pawn* p = new Pawn(i->getColor(),sq);
-        sq->putPawn(p);
-        white_pawns.push_back(p);
-    }
-    for(auto i: game.black_pawns) {
-        Square* sq = (*_board)(i->getSquare()->getX(),i->getSquare()->getY());
-        Pawn* p = new Pawn(i->getColor(),sq);
-        sq->putPawn(p);
-        black_pawns.push_back(p);
-    }
-    move = game.move;
-    tp = game.tp;
-    if(game.chosenPawn) {
-        choosePawn(game.chosenPawn->getSquare()->getX(),game.chosenPawn->getSquare()->getY());
-    }
-}*/
 Checkers::~Checkers() {
-    counter--;
     delete _board;
     for(auto i: white_pawns) delete i;
     for(auto i: black_pawns) delete i;
@@ -160,10 +109,11 @@ bool Checkers::isAbleToMove(Checkers::Pawn* p){
     char direction=1;
     Color col=p->getColor();
     if(col==BLACK) direction=-1;
-    if((b.onBoard(x-1,y+direction)&&!b(x-1,y+direction)->isOccupied())||\
-    (b.onBoard(x+1,y+direction)&&!b(x+1,y+direction)->isOccupied()))
-        return true;
-    if(p->isKing())
+    if(!p->isKing())
+        if((b.onBoard(x-1,y+direction)&&!b(x-1,y+direction)->isOccupied())||\
+        (b.onBoard(x+1,y+direction)&&!b(x+1,y+direction)->isOccupied()))
+            return true;
+    else
         if((b.onBoard(x-1,y-direction)&&!b(x-1,y-direction)->isOccupied())||\
             (b.onBoard(x+1,y-direction)&&!b(x+1,y-direction)->isOccupied()))
             return true;
@@ -189,7 +139,7 @@ bool Checkers::isAbleToCapture(Checkers::Pawn* p){
         b(x+1,y-direction)->getPawn()->getColor()!=col&&!b(x+2,y-2*direction)->isOccupied()))
             return true;
     }
-    else {
+    else { //king captures
         char x1=x+1, y1=y+1;
         for(x1,y1;b.onBoard(x1,y1);x1++,y1++){
             char pawnsBetween = b.howManyPawnsBetween(b(x,y),b(x1,y1));
@@ -400,7 +350,7 @@ int Checkers::evaluate() {
     return result;
 }
 
-std::list<Checkers::Pawn*> Checkers::listPawns() {
+std::list<Checkers::Pawn*>& Checkers::listPawns() {
     if(move==WHITE)
         return white_pawns;
     return black_pawns;
@@ -408,8 +358,3 @@ std::list<Checkers::Pawn*> Checkers::listPawns() {
 
 bool Checkers::onBoard(char a, char b)
     {return _board->onBoard(a,b);}
-
-/*std::vector<char> Checkers::makeDecision(char moves) {
-    DecisionTree tree(moves,this);
-    return tree.makeDecision();
-}*/

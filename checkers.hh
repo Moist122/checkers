@@ -13,10 +13,8 @@ constexpr char y_graphic_array = 2*board_size+3;
 class Checkers {
     //class representing a game of checkers
 public:
-static int counter;
     Checkers(); //create basic game object
     Checkers(const Checkers&); //copy constructor
-    void operator=(Checkers&);
     ~Checkers();
     class Board;
     class Pawn;
@@ -29,12 +27,6 @@ static int counter;
 
     void showBoard(char board[y_graphic_array][x_graphic_array]);
         //show the board representation as an array
-    bool choosePawn(char,char);
-        // choice of pawn to move - returns false if choice is invalid or pawn can't move
-    bool makeMove(char,char);
-        // choice of destination of pawn to move
-    bool capture(char,char);
-        // choice of next capture if possible
     bool checkWhiteWin();
         // true if black can't move or has no pawns
     bool checkBlackWin();
@@ -44,13 +36,19 @@ static int counter;
     bool playerChoice(char a, char b); //player chooses pawn or move
     bool gameWon(); //check if a player won the game
     void getChosenPawnCoordinates(char[3]);
-    std::list<Pawn*> listPawns();
-
-    int evaluate();
-    bool onBoard(char a, char b);
-    //std::vector<char> makeDecision(char);
+        //xy coordinates of currently chosen pawn
+    std::list<Pawn*>& listPawns();
+        //list of pawns of current player
+    int evaluate(); //get game value using heuristic
+    bool onBoard(char a, char b); //is square with coordinates a b on board?
     
 private:
+    bool choosePawn(char,char);
+        // choice of pawn to move - returns false if choice is invalid or pawn can't move
+    bool makeMove(char,char);
+        // choice of destination of pawn to move
+    bool capture(char,char);
+        // choice of next capture if possible
     bool isAbleToMove(Pawn*); //check if pawn can make move
     bool isAbleToCapture(Pawn*); //check if pawn can capture enemy pawn
     void changePlayer() //change current player

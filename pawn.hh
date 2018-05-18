@@ -13,7 +13,7 @@ public:
         {return _color;}
     Square* getSquare() const //get square on which pawn stands
         {return _square;}
-    bool const isKing() //is pawn king?
+    bool const isKing() //is pawn a king?
         {return king;}
 
     void putOnSquare(Square* sq); //put pawn on a square
@@ -22,5 +22,5 @@ public:
 private:
     const Color _color; //color of a pawn
     Square* _square; //square on which pawn stands
-    bool king; //true is pawn is king
+    bool king; //true if pawn is king
 };
