@@ -49,73 +49,34 @@ void DecisionTree::DecisionNode::addChildren() {
         char y = pawn->getSquare()->getY();
         if(gameState->playerChoice(x,y)) {
             Checkers* baseState = new Checkers(*gameState);
-            if(!pawn->isKing()) {
-                if(gameState->playerChoice(x+1,y+direction)) {
-                    std::vector<char> m = {x,y,char(x+1),char(y+direction)};
-                    children.push_back(new DecisionNode(m,gameState,this,depth+1));
-                    gameState = new Checkers(*baseState);
-                }
-                if(gameState->playerChoice(x-1,y+direction)) {
-                    std::vector<char> m = {x,y,char(x-1),char(y+direction)};
-                    children.push_back(new DecisionNode(m,gameState,this,depth+1));
-                    gameState = new Checkers(*baseState);
-                }
-                std::list<Checkers*> statesToCheck;
-                std::list<std::vector<char>> moveSeq;
-                statesToCheck.push_back(gameState);
-                moveSeq.push_back(std::vector<char>{x,y});
-                while(!statesToCheck.empty()) {
-                    Checkers* actualState = new Checkers(*statesToCheck.front());
-                    std::vector<char> moves = moveSeq.front();
-                    char x = *(moves.end()-2);
-                    char y = *(moves.end()-1);
-                    char cptrs[4][2] = {{char(x+2),char(y+2)},\
-                                        {char(x-2),char(y+2)},\
-                                        {char(x-2),char(y-2)},\
-                                        {char(x+2),char(y-2)}};
-                    for(auto cptr:cptrs) {
-                        if(actualState->playerChoice(cptr[0],cptr[1])) {
-                            // 2 game states to consider
-                            if(actualState->getTP()==actualState->CHOOSECAPTURE) {
-                                statesToCheck.push_back(actualState);
-                                auto newSeq = moves;
-                                newSeq.push_back(cptr[0]);
-                                newSeq.push_back(cptr[1]);
-                                moveSeq.push_back(newSeq);
-                            }
-                            else {
-                                auto newSeq = moves;
-                                newSeq.push_back(cptr[0]);
-                                newSeq.push_back(cptr[1]);
-                                children.push_back(new DecisionNode(newSeq,actualState,this,depth+1));
-                            }
-                        actualState = new Checkers(*statesToCheck.front());
-                        }
-                    }
-                    delete actualState;
-                    delete statesToCheck.front();
-                    statesToCheck.pop_front();
-                    moveSeq.pop_front();
-                }
-            }//non-king
-            else { //king
-                char directions[4][2] {{1,1},{1,-1},{-1,-1},{-1,1}};
-                std::list<Checkers*> statesToCheck;
-                std::list<std::vector<char>> moveSeq; //sequence of choices
-                statesToCheck.push_back(gameState);
-                moveSeq.push_back(std::vector<char>{x,y});
+            std::list<Checkers*> statesToCheck;
+            std::list<std::vector<char>> moveSeq;
+            statesToCheck.push_back(gameState);
+            moveSeq.push_back(std::vector<char>{x,y});
                 while(!statesToCheck.empty()) {
                     Checkers* actualState = new Checkers(*statesToCheck.front());
                     std::vector<char> moves = moveSeq.front();
                     char x = *(moves.end()-2);
                     char y = *(moves.end()-1);
                     std::list<std::vector<char>> mvs;
-                    for(auto j: directions) {
-                        char mult = 1;
-                        while(gameState->onBoard(x+mult*j[0],y+mult*j[1])) {
-                            mvs.push_back(std::vector<char>{char(x+mult*j[0]),\
-                                    char(y+mult*j[1])});
+                    pawn = actualState->getChosenPawn();
+                    if(!pawn->isKing()) {
+                        mvs = {{char(x+2),char(y+2)},\
+                                {char(x-2),char(y+2)},\
+                                {char(x-2),char(y-2)},\
+                                {char(x+2),char(y-2)},\
+                                {char(x+1),char(y+direction)},\
+                                {char(x-1),char(y+direction)}};
+                    }
+                    else {
+                        char directions[4][2] {{1,1},{1,-1},{-1,-1},{-1,1}};
+                        for(auto j: directions) {
+                            char mult = 1;
+                            while(gameState->onBoard(x+mult*j[0],y+mult*j[1])) {
+                                mvs.push_back(std::vector<char>{char(x+mult*j[0]),\
+                                        char(y+mult*j[1])});
                             ++mult;
+                            }
                         }
                     }
                     for(auto mv:mvs) {
@@ -142,7 +103,6 @@ void DecisionTree::DecisionNode::addChildren() {
                     statesToCheck.pop_front();
                     moveSeq.pop_front();
                 }
-            } //king
             delete baseState;
             gameState = new Checkers(*game);
         }//if can be chosen

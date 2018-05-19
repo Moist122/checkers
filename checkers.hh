@@ -35,6 +35,8 @@ public:
         {return move;}
     bool playerChoice(char a, char b); //player chooses pawn or move
     bool gameWon(); //check if a player won the game
+    Pawn* getChosenPawn() //get currently chosen pawn
+        {return chosenPawn;}
     void getChosenPawnCoordinates(char[3]);
         //xy coordinates of currently chosen pawn
     std::list<Pawn*>& listPawns();

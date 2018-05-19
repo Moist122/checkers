@@ -43,7 +43,7 @@ int main() {
             }
         }
         else { //AI move
-            vector<char> dec = makeDecision(&game, 6); //set difficulty
+            vector<char> dec = makeDecision(&game, 4); //set difficulty
 
             for(int i=0;i<dec.size();i+=2) {
                 if(game.getTP()==game.CHOOSEPAWN)
